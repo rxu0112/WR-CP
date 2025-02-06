@@ -1,1 +1,1 @@
-# Wasserstein-regularized-Conformal-Prediction
+# Wasserstein-regularized Conformal Prediction

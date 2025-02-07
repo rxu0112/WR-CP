@@ -1,1 +1,1 @@
-After running `WRCP.py` and `CQR.py` for each datasets and each trials, we obtain the results in `main_result` folder
+You can run `WRCP.py` and `CQR.py` for each dataset and each trial to reproduce the results in the `main_result` folder.

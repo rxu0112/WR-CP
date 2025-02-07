@@ -7,13 +7,12 @@ import os
 parser = argparse.ArgumentParser(description='CDPI')
 parser.add_argument('--hidden_dim', type=int, default=64)
 parser.add_argument('--l2_regularizer_weight', type=float, default=0.001)
-parser.add_argument('--lr', type=float, default=1e-3)  # 0.001
-parser.add_argument('--steps', type=int, default=3000)  # airfoil 3000, seattle 3000
-parser.add_argument('--dataset', type=str, default='japan')
-parser.add_argument('--version', type=str, default='v2')
+parser.add_argument('--lr', type=float, default=1e-3)
+parser.add_argument('--steps', type=int, default=3000)
+parser.add_argument('--dataset', type=str, default='airfoil')  # argument for specifying the dataset
+parser.add_argument('--version', type=str, default='v1')  # argument for specifying the trial
 flags = parser.parse_args()
 
-# this is the code for calculating W, KL, TV, etc and for correlation
 
 class MLP(nn.Module):
     def __init__(self, input_size):
@@ -29,7 +28,7 @@ class MLP(nn.Module):
             lin1, nn.Tanh(),  # nn.ReLU(True),
             nn.Dropout(),
             lin2, nn.Tanh(),  # nn.ReLU(True),
-            nn.Dropout(),  
+            nn.Dropout(),
             lin3)
 
     def forward(self, x):
@@ -139,4 +138,5 @@ if __name__ == "__main__":
     result['expectation_difference'] = Expectation_diff_summary
 
     RESULT.append(result)
-    pickle.dump(RESULT, open(project_path + "/correlation/correlation_result/" + flags.dataset + "/" + flags.version, "wb"))
+    pickle.dump(RESULT,
+                open(project_path + "/correlation/correlation_result/" + flags.dataset + "/" + flags.version, "wb"))

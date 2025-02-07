@@ -7,13 +7,14 @@ import os
 parser = argparse.ArgumentParser(description='WCCP with WRCP guarantee')
 parser.add_argument('--hidden_dim', type=int, default=64)
 parser.add_argument('--l2_regularizer_weight', type=float, default=0.001)
-parser.add_argument('--lr', type=float, default=1e-3)  # 0.001
-parser.add_argument('--penalty_anneal_iters', type=int, default=1000)
-parser.add_argument('--steps', type=int, default=3000)
-parser.add_argument('--dataset', type=str, default='seattle')
-parser.add_argument('--version', type=str, default='v1')
+parser.add_argument('--lr', type=float, default=1e-3)
+parser.add_argument('--penalty_anneal_iters', type=int,
+                    default=1000)  # 1000 for airfoil seattle pemsd4 pemsd8, 1500 for japan states
+parser.add_argument('--steps', type=int,
+                    default=3000)  # 3000 for airfoil seattle pemsd4 pemsd8, 3500 for japan states
+parser.add_argument('--dataset', type=str, default='airfoil')  # argument for specifying the dataset
+parser.add_argument('--version', type=str, default='v1')  # argument for specifying the dataset
 flags = parser.parse_args()
-
 
 class MLP(nn.Module):
     def __init__(self, input_size):
@@ -26,10 +27,10 @@ class MLP(nn.Module):
             nn.init.xavier_uniform_(lin.weight)
             nn.init.zeros_(lin.bias)
         self._main = nn.Sequential(
-            lin1, nn.Tanh(),  # nn.ReLU(True),
+            lin1, nn.Tanh(),
             nn.Dropout(),
-            lin2, nn.Tanh(),  # nn.ReLU(True),
-            nn.Dropout(), # not for japan, states
+            lin2, nn.Tanh(),
+            nn.Dropout(), # remove the last dropout layer for japan and states
             lin3)
 
     def forward(self, x):
@@ -52,13 +53,11 @@ if __name__ == "__main__":
                            allow_pickle='TRUE').item()
 
     # init
-
-
     RESULT = []
     RESULT_BOUND = pickle.load(
             open(project_path + "/guaranteed/guaranteed_result/" + flags.dataset + "/" + flags.version, "rb"))
 
-    for w_wr in [0]:
+    for w_wr in [0]:  # set w_wr = 0 since WC-CP is optimized by empirical risk minimization (erm).
         if w_wr:
             print('w_wr:' + str(w_wr))
         else:

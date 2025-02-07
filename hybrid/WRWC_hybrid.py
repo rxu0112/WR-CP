@@ -7,14 +7,15 @@ import os
 parser = argparse.ArgumentParser(description='WR-WC Hybrid')
 parser.add_argument('--hidden_dim', type=int, default=64)
 parser.add_argument('--l2_regularizer_weight', type=float, default=0.001)
-parser.add_argument('--lr', type=float, default=1e-3)  # 0.001
-parser.add_argument('--penalty_anneal_iters', type=int, default=1000)
-parser.add_argument('--steps', type=int, default=3000)
-parser.add_argument('--dataset', type=str, default='airfoil')
-parser.add_argument('--version', type=str, default='v1')
+parser.add_argument('--lr', type=float, default=1e-3)
+parser.add_argument('--penalty_anneal_iters', type=int,
+                    default=1000)  # 1000 for airfoil seattle pemsd4 pemsd8, 1500 for japan states
+parser.add_argument('--steps', type=int,
+                    default=3000)  # 3000 for airfoil seattle pemsd4 pemsd8, 3500 for japan states
+parser.add_argument('--dataset', type=str, default='airfoil')  # argument for specifying the dataset
+parser.add_argument('--version', type=str, default='v1')  # argument for specifying the trial
 flags = parser.parse_args()
 
-# this is the code for hybrid of wasserstein-regularization and worst-case approach
 
 class MLP(nn.Module):
     def __init__(self, input_size):
@@ -27,10 +28,10 @@ class MLP(nn.Module):
             nn.init.xavier_uniform_(lin.weight)
             nn.init.zeros_(lin.bias)
         self._main = nn.Sequential(
-            lin1, nn.Tanh(),  # nn.ReLU(True),
+            lin1, nn.Tanh(),
             nn.Dropout(),
-            lin2, nn.Tanh(),  # nn.ReLU(True),
-            nn.Dropout(), # not for japan, states
+            lin2, nn.Tanh(),
+            nn.Dropout(), # remove the last dropout layer for japan and states
             lin3)
 
     def forward(self, x):
@@ -60,8 +61,15 @@ if __name__ == "__main__":
         RESULT = []
         print('No previous hybrid_result')
 
+    # beta values for each dataset at 1-alpha=0.9:
+    # airfoil [9]
+    # pemsd4 [11]
+    # pemsd8 [9]
+    # seattle [8]
+    # states [13]
+    # japan [20]
 
-    for w_wr in [0, 2, 3, 4.5, 9]:
+    for w_wr in [9]:  # change beta values according to dataset argument
         if w_wr:
             print('w_wr:' + str(w_wr))
         else:
@@ -198,7 +206,7 @@ if __name__ == "__main__":
         result['test_worst_gap'] = test_worst_gap
         result['test_detailed_coverage'] = test_detailed_coverage
         result['test_detailed_size'] = test_detailed_size
-        result['test_W'] = test_W # compared with the initial algorithm, further include W distance in the result
+        result['test_W'] = test_W
 
         if w_wr:
             result['opt'] = 'wr'

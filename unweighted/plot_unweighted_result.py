@@ -8,7 +8,7 @@ import os
 
 project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 dataset_list = ['airfoil', 'pemsd4', 'pemsd8', 'seattle', 'states', 'japan']
-versions = [1]
+versions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 alpha_list = [0.2]
 
 COVERAGE = []

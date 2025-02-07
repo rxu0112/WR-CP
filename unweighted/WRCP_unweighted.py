@@ -8,10 +8,12 @@ parser = argparse.ArgumentParser(description='WR_CP_unweighted')
 parser.add_argument('--hidden_dim', type=int, default=64)
 parser.add_argument('--l2_regularizer_weight', type=float, default=0.001)
 parser.add_argument('--lr', type=float, default=1e-3)  # 0.001
-parser.add_argument('--penalty_anneal_iters', type=int, default=1000)
-parser.add_argument('--steps', type=int, default=3000)
-parser.add_argument('--dataset', type=str, default='airfoil')
-parser.add_argument('--version', type=str, default='v1')
+parser.add_argument('--penalty_anneal_iters', type=int,
+                    default=1000)  # 1000 for airfoil seattle pemsd4 pemsd8, 1500 for japan states
+parser.add_argument('--steps', type=int,
+                    default=3000)  # 3000 for airfoil seattle pemsd4 pemsd8, 3500 for japan states
+parser.add_argument('--dataset', type=str, default='airfoil')  # argument for specifying the dataset
+parser.add_argument('--version', type=str, default='v1')  # argument for specifying the trial
 flags = parser.parse_args()
 
 # this is the code for wasserstein regularization without importance weighting
@@ -27,10 +29,10 @@ class MLP(nn.Module):
             nn.init.xavier_uniform_(lin.weight)
             nn.init.zeros_(lin.bias)
         self._main = nn.Sequential(
-            lin1, nn.Tanh(),  # nn.ReLU(True),
+            lin1, nn.Tanh(),
             nn.Dropout(),
-            lin2, nn.Tanh(),  # nn.ReLU(True),
-            nn.Dropout(), # not for japan, states
+            lin2, nn.Tanh(),
+            nn.Dropout(), # remove the last dropout layer for japan and states
             lin3)
 
     def forward(self, x):
@@ -59,7 +61,15 @@ if __name__ == "__main__":
         RESULT = []
         print('No previous unweighted_result')
 
-    for w_wr in [4.5]:
+    # beta values for each dataset at 1-alpha=0.8:
+    # airfoil [4.5]
+    # pemsd4 [9]
+    # pemsd8 [9]
+    # seattle [6]
+    # states [8]
+    # japan [20]
+
+    for w_wr in [4.5]:  # change beta values according to dataset argument
         if w_wr:
             print('w_wr:' + str(w_wr))
         else:
@@ -150,7 +160,7 @@ if __name__ == "__main__":
                 size_hour = []
 
                 for alpha in alpha_array:
-                    Covered, Size = Testing_Coverage(label, pred, R_cal, alpha, weights)  # correct func
+                    Covered, Size = Testing_Coverage(label, pred, R_cal, alpha, weights)
                     coverage_hour.append(Covered / len(label))
                     size_hour.append(Size)
 
@@ -193,7 +203,7 @@ if __name__ == "__main__":
         result['test_worst_gap'] = test_worst_gap
         result['test_detailed_coverage'] = test_detailed_coverage
         result['test_detailed_size'] = test_detailed_size
-        result['test_W'] = test_W # compared with the initial algorithm, further include W distance in the result
+        result['test_W'] = test_W
 
 
         result['opt'] = 'wr_uw'

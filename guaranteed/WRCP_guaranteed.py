@@ -7,16 +7,14 @@ import os
 parser = argparse.ArgumentParser(description='WRCP guarantee')
 parser.add_argument('--hidden_dim', type=int, default=64)
 parser.add_argument('--l2_regularizer_weight', type=float, default=0.001)
-parser.add_argument('--lr', type=float, default=1e-3)  # 0.001
-parser.add_argument('--penalty_anneal_iters', type=int, default=1000)
-# airfoil seattle pemsd4 pemsd8 1000, japan states 1500
-parser.add_argument('--steps', type=int, default=1000)
-# airfoil seattle pemsd4 pemsd8 3000, japan states 3500
-parser.add_argument('--dataset', type=str, default='pemsd8')
-parser.add_argument('--version', type=str, default='v3')
+parser.add_argument('--lr', type=float, default=1e-3)
+parser.add_argument('--penalty_anneal_iters', type=int,
+                    default=1000)  # 1000 for airfoil seattle pemsd4 pemsd8, 1500 for japan states
+parser.add_argument('--steps', type=int,
+                    default=3000)  # 3000 for airfoil seattle pemsd4 pemsd8, 3500 for japan states
+parser.add_argument('--dataset', type=str, default='airfoil')  # argument for specifying the dataset
+parser.add_argument('--version', type=str, default='v1')  # argument for specifying the trial
 flags = parser.parse_args()
-
-# this is the code for obtaining coverage guarantee 1-alpha-alpha_D of wasserstein regularization
 
 class MLP(nn.Module):
     def __init__(self, input_size):
@@ -29,10 +27,10 @@ class MLP(nn.Module):
             nn.init.xavier_uniform_(lin.weight)
             nn.init.zeros_(lin.bias)
         self._main = nn.Sequential(
-            lin1, nn.Tanh(),  # nn.ReLU(True),
+            lin1, nn.Tanh(),
             nn.Dropout(),
-            lin2, nn.Tanh(),  # nn.ReLU(True),
-            nn.Dropout(),  # not for japan, states
+            lin2, nn.Tanh(),
+            nn.Dropout(),  # remove the last dropout layer for japan and states
             lin3)
 
     def forward(self, x):
@@ -55,6 +53,8 @@ if __name__ == "__main__":
                            allow_pickle='TRUE').item()
 
     Recalibration_RESULT = []
+
+    # find WR-CP coverage guarantee on each dataset with beta = 1.
     for w_wr in [1]:
         if w_wr:
             print('w_wr:' + str(w_wr))

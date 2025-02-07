@@ -7,16 +7,15 @@ import os
 parser = argparse.ArgumentParser(description='WR_CP_with_baselines')
 parser.add_argument('--hidden_dim', type=int, default=64)
 parser.add_argument('--l2_regularizer_weight', type=float, default=0.001)
-parser.add_argument('--lr', type=float, default=1e-3)  # 0.001
-parser.add_argument('--penalty_anneal_iters', type=int, default=1000)
-# airfoil seattle pemsd4 pemsd8 1000, japan states 1500
-parser.add_argument('--steps', type=int, default=3000)
-# airfoil seattle pemsd4 pemsd8 3000, japan states 3500
-parser.add_argument('--dataset', type=str, default='airfoil')
-parser.add_argument('--version', type=str, default='v1')
+parser.add_argument('--lr', type=float, default=1e-3)
+parser.add_argument('--penalty_anneal_iters', type=int,
+                    default=1000)  # 1000 for airfoil seattle pemsd4 pemsd8, 1500 for japan states
+parser.add_argument('--steps', type=int,
+                    default=3000)  # 3000 for airfoil seattle pemsd4 pemsd8, 3500 for japan states
+parser.add_argument('--dataset', type=str, default='airfoil')  # argument for specifying the dataset
+parser.add_argument('--version', type=str, default='v1')  # argument for specifying the trial
 flags = parser.parse_args()
 
-# this is the code for most experimental result
 
 class MLP(nn.Module):
     def __init__(self, input_size):
@@ -29,10 +28,10 @@ class MLP(nn.Module):
             nn.init.xavier_uniform_(lin.weight)
             nn.init.zeros_(lin.bias)
         self._main = nn.Sequential(
-            lin1, nn.Tanh(),  # nn.ReLU(True),
+            lin1, nn.Tanh(),
             nn.Dropout(),
-            lin2, nn.Tanh(),  # nn.ReLU(True),
-            nn.Dropout(), # not for japan, states
+            lin2, nn.Tanh(),
+            nn.Dropout(),  # remove the last dropout layer for japan and states
             lin3)
 
     def forward(self, x):
@@ -60,14 +59,24 @@ if __name__ == "__main__":
         RESULT = pickle.load(open(project_path + "/main/main_result/" + flags.dataset + "/" + flags.version, "rb"))
     except (FileNotFoundError, EOFError, pickle.UnpicklingError):
         RESULT = []
-        print('No previous WR_CP_result')
+        print('No previous WRCP_result')
 
+    # beta values for each dataset:
+    # airfoil [1, 1.5, 2, 2.5, 3, 3.5, 4.5, 6, 8, 9, 13, 20]
+    # pemsd4 [1, 1.5, 2, 2.5, 3, 5, 7, 9, 11, 15, 20]
+    # pemsd8 [1, 1.5, 2, 2.5, 3, 4, 5, 7, 9, 17]
+    # seattle [1, 2, 3, 4, 4.5, 5, 5.5, 6, 7, 8, 10, 13, 15, 20]
+    # states [1, 1.5, 2, 2.5, 3, 5, 6, 8, 13]
+    # japan [1, 2, 3, 4, 6, 8, 10, 13, 20]
 
-    for w_wr in [0, 5]:
+    for w_wr in [0, 1, 1.5, 2, 2.5, 3, 3.5, 4.5, 6, 8, 9, 13, 20]:  # change beta values according to dataset argument
         if w_wr:
             print('w_wr:' + str(w_wr))
         else:
             print('erm')
+
+        # w_wr > 0: mlp is optimized by Wasserstein-regularization.
+        # w_wr = 0: mlp is optimized by empirical risk minimization.
 
         logger = Logger()
         alpha_array = np.linspace(0.1, 0.9, 9)
@@ -76,7 +85,6 @@ if __name__ == "__main__":
 
         mlp = MLP(train_envs[0]['images'].shape[1]).cuda()
         optimizer = optim.Adam(mlp.parameters(), lr=flags.lr)
-
 
         pretty_print('step', 'train l1', 'wr penalty')
 
@@ -122,6 +130,11 @@ if __name__ == "__main__":
         cp_iterator = [[0, 1]] if w_wr != 0 else [[1, 0], [0, 1], [0, 0]]
 
         for [wc, iw] in cp_iterator:
+            # wc = 1: worst-case conformal prediction (WC-CP)
+            # iw = 1: importance-weighted conformal prediction (IW-CP)
+            # wc = 0 and iw = 0: split conformal prediction (SCP)
+            # Wasserstein-regularized conformal prediction (WR-CP) combines Wasserstein-regularization (w_wr > 0) during
+            # training and IW-CP (iw = 1) during inference
 
             # check coverage on test
             test_overall_gap_list = []
@@ -167,10 +180,11 @@ if __name__ == "__main__":
 
                         if iw == 1:
                             W_env = Wasserstein_distance(cal_envs_uni['res_set'].flatten(), env['res_set'].flatten(),
-                                             u_weights=env['weights'], v_weights=None).cpu().detach().numpy()
+                                                         u_weights=env['weights'],
+                                                         v_weights=None).cpu().detach().numpy()
                         else:
                             W_env = Wasserstein_distance(cal_envs_uni['res_set'].flatten(), env['res_set'].flatten(),
-                                                     u_weights=None, v_weights=None).cpu().detach().numpy()
+                                                         u_weights=None, v_weights=None).cpu().detach().numpy()
                         W_summary_test.append(W_env)
 
                 if wc == 1:
@@ -209,7 +223,7 @@ if __name__ == "__main__":
                         size_summary_test.append(size_hour)
 
                         W_env = Wasserstein_distance(cal_envs_uni['res_set'].flatten(), env['res_set'].flatten(),
-                                                 u_weights=None, v_weights=None).cpu().detach().numpy()
+                                                     u_weights=None, v_weights=None).cpu().detach().numpy()
                         W_summary_test.append(W_env)
 
                 test_res_trial = torch.stack([e['res'] for e in test_envs]).mean()
@@ -234,7 +248,7 @@ if __name__ == "__main__":
             test_overall_gap = np.mean(test_overall_gap_list)  # gap float after average over env, alpha, i
             test_worst_gap = np.mean(test_worst_gap_list)
             test_W = np.mean(test_W_list)
-            # print results
+
             result = {}
             result['test_res'] = test_res
             result['test_overall_gap'] = test_overall_gap
@@ -242,7 +256,7 @@ if __name__ == "__main__":
             result['test_worst_gap'] = test_worst_gap
             result['test_detailed_coverage'] = test_detailed_coverage
             result['test_detailed_size'] = test_detailed_size
-            result['test_W'] = test_W # compared with the initial algorithm, further include W distance in the result
+            result['test_W'] = test_W
 
             if w_wr:
                 result['opt'] = 'wr'

@@ -7,10 +7,10 @@ import os
 parser = argparse.ArgumentParser(description='CQR')
 parser.add_argument('--hidden_dim', type=int, default=64)
 parser.add_argument('--l2_regularizer_weight', type=float, default=0.001)
-parser.add_argument('--lr', type=float, default=1e-3)  # 0.001
-parser.add_argument('--steps', type=int, default=3000)  # airfoil 3000, seattle 3000
-parser.add_argument('--dataset', type=str, default='seattle')
-parser.add_argument('--version', type=str, default='v10')
+parser.add_argument('--lr', type=float, default=1e-3)
+parser.add_argument('--steps', type=int, default=3000)
+parser.add_argument('--dataset', type=str, default='airfoil')  # argument for specifying the dataset
+parser.add_argument('--version', type=str, default='v1')  # argument for specifying the trial
 flags = parser.parse_args()
 
 

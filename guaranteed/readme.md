@@ -1,0 +1,2 @@
+To obtain experiment results in the `guaranteed_result` folder, we first run `WRCP_guaranteed.py` to get the coverage guarantee $1-\alpha-\alpha_D$ for each dataset when $\beta=1$. Then, we implement `WCCP_with_WRCP_guarantee.py` to get the coverage and predictioon set size of WC-CP at $1-\alpha-\alpha_D$.
+With all experiment results in the `main_result` and `guaranteed_result` folder, `plot_guaranteed_result.py` generates Figure 7.

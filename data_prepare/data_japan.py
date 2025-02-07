@@ -1,6 +1,4 @@
-import numpy as np
 import pandas as pd
-import torch
 from module import *
 from sklearn.model_selection import GridSearchCV
 import pickle
@@ -51,9 +49,9 @@ def preprocess(data, endpoint, node):
     return Input_stack
 
 
-ver = 11
+ver = 1 # modify ver from 1 to 10 for 10 sampling trials
 locations = random.sample(range(45), 10)
-locations = [19, 39, 26, 2, 30, 0, 40, 31, 14, 16] #1-10
+locations = [19, 39, 26, 2, 30, 0, 40, 31, 14, 16]
 
 project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 file_path = os.path.join(project_path, "data\\japan\\raw\\japan.txt")

@@ -1,6 +1,4 @@
-import numpy as np
 import pandas as pd
-import torch
 from module import *
 from sklearn.model_selection import GridSearchCV
 import pickle
@@ -88,15 +86,6 @@ def sampling(sample_size, env):
     return image_samples[:sample_size], label_samples[:sample_size]
 
 
-def generate_pairs(num_pairs, step, end):
-    pairs = []
-    for _ in range(num_pairs):
-        a1 = random.randint(0, end)  # a1 can be from 0 to 23
-        a2 = a1 + step  # Ensure a2 - a1 = 2
-        pairs.append([a1, a2])
-    return pairs
-
-
 def generate_triplets(n):
     triplets = []
     for _ in range(n):
@@ -107,7 +96,7 @@ def generate_triplets(n):
     return triplets
 
 
-ver = 1
+ver = 1 # modify ver from 1 to 10 for 10 sampling trials
 roads = [[69, 72], [254, 257], [104, 107], [49, 52], [86, 89], [92, 95], [162, 165], [29, 32], [35, 38], [31, 34]]
 project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 workday_path = os.path.join(project_path, "data\\pemsd4\\raw\\Workday.txt")

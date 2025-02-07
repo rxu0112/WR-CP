@@ -50,8 +50,7 @@ def preprocess(data, endpoint, node):
     return Input_stack
 
 
-ver = 11
-# locations = random.sample(range(49), 10)
+ver = 1 # modify ver from 1 to 10 for 10 sampling trials
 locations = [10, 32, 42, 45, 20, 24, 16, 47, 48, 31]
 project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 file_path = os.path.join(project_path, "data\\states\\raw\\state360.txt")

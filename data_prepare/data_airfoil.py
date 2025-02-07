@@ -1,13 +1,10 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-import numpy as np
-import torch
 from module import *
 from utils import *
 from sklearn.model_selection import GridSearchCV
 import pickle
 import random
-from sklearn.preprocessing import PowerTransformer
 import os
 def generate_triplets(n):
     triplets = []
@@ -18,7 +15,7 @@ def generate_triplets(n):
         triplets.append([ai, bi, ci])
     return triplets
 
-ver = 1
+ver = 1 # modify ver from 1 to 10 for 10 sampling trials
 
 column_names = ['frequency', 'angle', 'length', 'velocity', 'thickness', 'pressure']
 
@@ -69,7 +66,7 @@ df_3_cal = df_3.iloc[1::3]
 df_3_test = df_3.iloc[2::3]
 
 test_size = 170
-test_envs_num = 30 # more test envs will make scp,iw scpe more diverse(higher std)
+test_envs_num = 30
 triplets_list = generate_triplets(test_envs_num)
 df_test = []
 for portion in triplets_list:
@@ -80,10 +77,9 @@ for portion in triplets_list:
     df_test.append(new_df)
 
 
-##
 train_envs, cal_envs, test_envs = [], [], []
 df_train = [df_1_train, df_2_train, df_3_train]
-df_cal = [df_1_cal, df_2_cal, df_3_cal] #manually change cal will further change performance of scp and cpdi
+df_cal = [df_1_cal, df_2_cal, df_3_cal]
 
 
 for idx, env in enumerate(df_train):
@@ -120,8 +116,7 @@ for e in train_envs + test_envs + cal_envs:
     label_sizes.append(len(e['labels']))
 universal_label = torch.concatenate(universal_label)
 split_indices = np.cumsum(label_sizes)[:-1]
-# pt = PowerTransformer(method='yeo-johnson')
-# transformed_label = pt.fit_transform(universal_label.cpu())
+
 sqrt_label = np.sqrt(np.abs(universal_label.cpu()))
 transformed_label = np.where(universal_label.cpu() < 0, -sqrt_label, sqrt_label)
 transformed_label_list = np.split(transformed_label, split_indices)

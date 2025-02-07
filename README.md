@@ -1,5 +1,5 @@
 # Wasserstein-regularized Conformal Prediction
-This is the source code for the paper [Wasserstein-Regularized Conformal Prediction under General Distribution Shift](iclr.cc/virtual/2025/poster/29180)
+This is the source code for the paper [Wasserstein-Regularized Conformal Prediction under General Distribution Shift](iclr.cc/virtual/2025/poster/29180).
 ![screenshot](Method.png)
 **(a)** Joint distribution shift can include both covariate shift ($P_X\neq Q_X$) and concept shift ($f_P\neq f_Q$). Coverage gap is the absolute difference in cumulative probabilities of calibration and test conformal scores at the empirical $1-\alpha$ quantile $\tau$. We first address covariate-shift-induced Wasserstein distance by applying importance weighting to calibration samples, and further minimize concept-shift-induced Wasserstein distance to obtain accurate and efficient prediction sets;
 

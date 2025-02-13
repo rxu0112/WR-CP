@@ -17,6 +17,6 @@ Sec 6.2| Table 1 |`correlation`|`distance_correlation.py`|`table_correlation_res
 Sec 6.3|Figure 3 |`main`|`WRCP_main.py`|`plot_W_distance_min.py`
 Sec 6.4|Figure 4,11-18|`main`|`WRCP_main.py`, `CQR_main.py`|`plot_main_result.py`
 Sec 6.5|Figure 5|`main`|`WRCP_main.py`|`plot_ablation.py`
-Appendix B.1|Figure 6|`hybrid`|`WRWC_hybrid.py`|`plot_hybrid_result.py`
-Appendix B.2|Figure 7|`guaranteed`|`WCCP_with_WRCP_guarantee.py`, `WRCP_guaranteed.py`|`plot_guaranteed_result.py`
-Appendix D.3|Figure 10|`unweighted`|`WRCP_unweighted.py`|`plot_unweighted_result.py`
+Appendix C|Figure 8|`unweighted`|`WRCP_unweighted.py`|`plot_unweighted_result.py`
+Appendix G.1|Figure 19|`guaranteed`|`WCCP_with_WRCP_guarantee.py`, `WRCP_guaranteed.py`|`plot_guaranteed_result.py`
+Appendix G.2|Figure 20|`hybrid`|`WRWC_hybrid.py`|`plot_hybrid_result.py`

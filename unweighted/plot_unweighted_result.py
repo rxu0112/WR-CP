@@ -182,6 +182,6 @@ for i in range(6):
 gap_wrcp_uw = []
 for i in range(6):
     gap_wrcp_uw.append(np.mean(np.abs(Coverage_desired[i]-Coverage_wrcp_uw[i])))
-print(np.mean(gap_wrcp))
-print(np.mean(gap_wrcp_uw))
-print(1-np.mean(Size_reduction))
+print('WR-CP gap:' +str(np.mean(gap_wrcp)))
+print('WR-CP(uw) gap:'+str(np.mean(gap_wrcp_uw)))
+print('Size reduction:'+str(1-np.mean(Size_reduction)))

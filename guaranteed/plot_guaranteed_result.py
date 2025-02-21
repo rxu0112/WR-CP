@@ -184,3 +184,4 @@ for a, alpha in enumerate(alpha_list):
 
     plt.show()
 
+print('Size reduction:'+str(1-np.mean(Size_reduction)))

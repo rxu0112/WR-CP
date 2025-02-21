@@ -202,3 +202,11 @@ for a, alpha in enumerate(alpha_list):
     fig.legend(handles=legend_patches + [line_legend], loc='lower center', ncol=6, prop={'size': 12})
 
     plt.show()
+
+Gap = []
+for i in range(54):
+    Gap.append(np.mean(np.abs(Coverage_desired[i]-Coverage_wrcp[i])))
+
+print('coverage gap:'+str(np.mean(Gap)))
+print('size reduction:'+str(1-np.mean(Size_reduction)))
+

@@ -3,7 +3,7 @@ This is the source code for the paper [Wasserstein-Regularized Conformal Predict
 ![screenshot](Method.png)
 **(a)** Joint distribution shift can include both covariate shift ($P_X\neq Q_X$) and concept shift ($f_P\neq f_Q$). Coverage gap is the absolute difference in cumulative probabilities of calibration and test conformal scores at the empirical $1-\alpha$ quantile $\tau$. We first address covariate-shift-induced Wasserstein distance by applying importance weighting to calibration samples, and further minimize concept-shift-induced Wasserstein distance for accurate and efficient prediction sets;
 
-**(b)** $Q_V^{(1)}$ and $Q_V^{(2)}$ are two distinct test conformal score distributions. Wasserstein distance integrates the vertical gap between two cumulative probability distributions overall *all* quantiles, and is sensitive to coverage gap changes at *any* quantile. Total variation distance fails to indicate coverage gap changes thoroughly as it is agnostic about where two distributions diverge.
+**(b)** $Q_V^{(1)}$ and $Q_V^{(2)}$ are two distinct test conformal score distributions. Wasserstein distance integrates the vertical gap between two cumulative probability distributions overall *all* quantiles, and is sensitive to coverage gap changes at *any* quantile. Total variation distance fails to indicate coverage gap changes thoroughly, as it is agnostic about where two distributions diverge.
 
 
 ## Data 
